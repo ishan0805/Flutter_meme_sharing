@@ -1,0 +1,4 @@
+#Sun Feb 14 12:44:30 IST 2021
+base.0=E\:\\deviceapp\\projects\\crio_meme_sharing_app\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\out\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
