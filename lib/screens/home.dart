@@ -52,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return CreateMeme();
               }));
+
               // _showMyDialog();
             },
           ),
@@ -125,19 +126,38 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: const EdgeInsets.all(3.0),
                       child: Row(
                         children: [
-                          Text(
-                            '  by ${meme.name}',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                color: Colors.teal),
+                          FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Text(
+                              '  by ${meme.name}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.teal),
+                            ),
                           ),
                           Spacer(),
-                          InkWell(
-                              onTap: () {
-                                _showMyDialog(meme.id);
-                              },
-                              child: Text("EDIT "))
+                          PopupMenuButton<String>(
+                            itemBuilder: (BuildContext context) {
+                              return [
+                                PopupMenuItem<String>(
+                                  value: "edit",
+                                  child: Text('Edit'),
+                                ),
+                                PopupMenuItem<String>(
+                                  value: "delete",
+                                  child: Text('Delete'),
+                                )
+                              ];
+                            },
+                            onSelected: (value) {
+                              if (value == 'edit') {
+                                _showEditDialog(meme.id);
+                              } else {
+                                _showDeleteDialog(meme.id);
+                              }
+                            },
+                          ),
                         ],
                       ),
                     )),
@@ -148,25 +168,27 @@ class _MyHomePageState extends State<MyHomePage> {
                         image: _getImage(meme.url),
                         //  'https://miro.medium.com/max/405/1*J9_05FyiiDk2y2hhbOwNlg.png'),
                         //   AssetImage('assets/page_not_found.png'),
-                        fit: BoxFit.fill),
+                        fit: BoxFit.fitWidth),
                   ),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 5.0, right: 5.0, bottom: 5.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.fitHeight,
+                        child: Text(
                           "Caption :",
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Colors.teal),
                         ),
-                        Text(
+                      ),
+                      FittedBox(
+                        fit: BoxFit.fitHeight,
+                        child: Text(
                           '${meme.description}',
                           style: TextStyle(
                               fontSize: 15,
@@ -174,8 +196,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               fontWeight: FontWeight.w600,
                               color: Colors.tealAccent),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -229,7 +251,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> _showMyDialog(int id) async {
+  Future<void> _showEditDialog(int id) async {
     String new_description, new_url;
     return showDialog<void>(
       context: context,
@@ -287,9 +309,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           actions: <Widget>[
-            InkWell(
-              child: Text('Do It !!'),
-              onTap: () async {
+            TextButton(
+              onPressed: () async {
                 if (_formkey.currentState.validate()) {
                   _formkey.currentState.save();
 
@@ -312,13 +333,58 @@ class _MyHomePageState extends State<MyHomePage> {
                   Navigator.of(context).pop();
                 }
               },
+              child: Text('Do It !!'),
             ),
-            InkWell(
+            TextButton(
               child: Text('Not Interested Anymore'),
-              onTap: () {
+              onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showDeleteDialog(int id) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Delete this  Meme',
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                bool isTrue = await _memeBloc.deleteMeme(id);
+                if (isTrue) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Meme Deleted'),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Some Error Occured'),
+                    ),
+                  );
+                }
+                Navigator.of(context).pop();
+              },
+              child: Text('Do It !!'),
+            ),
+            Spacer(),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Not Interested Anymore'),
+            )
           ],
         );
       },

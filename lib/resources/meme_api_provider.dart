@@ -37,4 +37,13 @@ class MemeApiProvider {
     });
     return true;
   }
+
+  Future<bool> deleteMeme(int id) async {
+    await _apiHelper
+        .httpDelete('${ApiPaths.deleteMeme}/$id')
+        .catchError((onError) {
+      return false;
+    });
+    return true;
+  }
 }

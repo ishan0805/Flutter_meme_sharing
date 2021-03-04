@@ -33,6 +33,14 @@ class MemeBloc {
     return event;
   }
 
+  Future<bool> deleteMeme(int id) async {
+    final event = await _repository.deleteMeme(id);
+    if (event) {
+      getMemes();
+    }
+    return event;
+  }
+
   void dispose() {
     _memestream.close();
   }

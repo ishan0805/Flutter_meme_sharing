@@ -14,4 +14,8 @@ class MemeRepository {
   Future<bool> editMeme(Memes meme) {
     return _apiProvider.editMeme(meme);
   }
+
+  Future<bool> deleteMeme(int id) {
+    return _apiProvider.deleteMeme(id);
+  }
 }

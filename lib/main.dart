@@ -17,7 +17,11 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Meme Sharing',
-        theme: ThemeData.dark(),
+        theme: ThemeData.dark().copyWith(
+            textButtonTheme: TextButtonThemeData(
+                style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.resolveWith(
+                        (state) => Colors.white)))),
         home: //CreateMeme(),
             MyHomePage(title: 'Meme Sharing'),
       ),

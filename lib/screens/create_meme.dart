@@ -169,6 +169,8 @@ class _CreateMemeState extends State<CreateMeme> {
                         ),
                       );
                     }
+                    Navigator.pop(context);
+                    Navigator.pop(context);
                   }
                 },
                 child: Text(

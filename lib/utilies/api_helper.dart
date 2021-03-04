@@ -32,6 +32,29 @@ class ApiHelper implements ApiService {
     return responseJson;
   }
 
+  /// Http Delete request
+  Future<dynamic> httpDelete(String path) async {
+    var responseJson;
+
+    try {
+      // final token = await getToken();
+
+      //  print(token);
+
+      developer.log('DELETE ${ApiPaths.baseUrl}$path', name: 'network request');
+      final response = await http.delete('${ApiPaths.baseUrl}$path', headers: {
+        // "X-Custom-Token": token,
+      });
+      developer.log(response.statusCode.toString(), name: 'network response');
+
+      print(response.statusCode);
+      responseJson = _returnResponse(response);
+    } on SocketException {
+      throw Exception('No Internet connection');
+    }
+    return responseJson;
+  }
+
   /// HTTP Post Request
   Future<dynamic> httpPost(String path, Map<String, dynamic> body) async {
     var responseJson;
