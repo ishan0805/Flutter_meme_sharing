@@ -1,393 +1,436 @@
-import 'package:crio_meme_sharing_app/bloc/meme_bloc.dart';
-import 'package:crio_meme_sharing_app/models/meme.dart';
-import 'package:crio_meme_sharing_app/screens/create_meme.dart';
-//import 'package:crio_meme_sharing_app/utilies/size_config.dart';
+import 'package:crio_meme_sharing_app/utilies/size_config.dart';
 import 'package:flutter/material.dart';
-import 'dart:js' as js;
-import 'package:shimmer/shimmer.dart';
-import 'package:provider/provider.dart';
 
-class MyHomePage extends StatefulWidget {
-  final String title;
-
-  MyHomePage({Key key, this.title}) : super(key: key);
+class Home extends StatefulWidget {
+  Home({Key key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomeState createState() => _HomeState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  ScrollController _scrollController = ScrollController();
+class _HomeState extends State<Home> {
   final _formkey = GlobalKey<FormState>();
-  MemeBloc _memeBloc;
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _memeBloc.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration(milliseconds: 100), () {
-      _memeBloc.getMemes();
-    });
-
-    // print('here');
-  }
-
+  var size = SizeConfig();
+  bool isOnSignIn = false;
+  TextEditingController passwordSignUp = TextEditingController();
+  TextEditingController passwordConfirmSignUp = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    _memeBloc = Provider.of<MemeBloc>(context);
+    size.init(context); //Initializing size of page
+
     return Scaffold(
-      drawer: Drawer(
-          child: ListView(
-        children: [
-          ListTile(
-            title: Text('Post Meme'),
-            leading: Icon(Icons.add_box),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return CreateMeme();
-              }));
-
-              // _showMyDialog();
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.file_copy_rounded),
-            title: Text('See Documents For Api'),
-            onTap: () {
-              js.context.callMethod('open', [
-                'https://memesharing.herokuapp.com/swagger-ui/#/default/get_memes_get'
-              ]);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.directions_run_outlined),
-            title: Text('Contact Me'),
-            onTap: () {
-              js.context.callMethod(
-                  'open', ['https://www.linkedin.com/in/ishan0805/']);
-              Navigator.pop(context);
-            },
-          )
-        ],
-      )),
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 0,
-        title: Text('MEME SHARING'),
-      ),
-      body: StreamBuilder<List<Memes>>(
-          stream: _memeBloc.memes,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData || snapshot.hasError) {
-              return Center(child: CircularProgressIndicator());
-              //_buildLoadingView();
-            }
-            return Scrollbar(
-              thickness: 10.0,
-              radius: Radius.circular(10),
-              controller: _scrollController,
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: GridView.count(
-                  crossAxisCount: 3,
-                  controller: _scrollController,
-                  children: _buildCards(snapshot.data),
-                ),
-              ),
-            );
-          }),
-    );
-  }
-
-  List<Card> _buildCards(List<Memes> memes) {
-    List<Card> cards = [];
-    for (var meme in memes) {
-      cards.add(Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          elevation: 5.0,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: Row(
-                        children: [
-                          FittedBox(
-                            fit: BoxFit.fitWidth,
-                            child: Text(
-                              '  by ${meme.name}',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: Colors.teal),
-                            ),
-                          ),
-                          Spacer(),
-                          PopupMenuButton<String>(
-                            itemBuilder: (BuildContext context) {
-                              return [
-                                PopupMenuItem<String>(
-                                  value: "edit",
-                                  child: Text('Edit'),
-                                ),
-                                PopupMenuItem<String>(
-                                  value: "delete",
-                                  child: Text('Delete'),
-                                )
-                              ];
-                            },
-                            onSelected: (value) {
-                              if (value == 'edit') {
-                                _showEditDialog(meme.id);
-                              } else {
-                                _showDeleteDialog(meme.id);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    )),
-                Expanded(
-                  flex: 10,
-                  child: Center(
-                    child: Image(
-                        image: _getImage(meme.url),
-                        //  'https://miro.medium.com/max/405/1*J9_05FyiiDk2y2hhbOwNlg.png'),
-                        //   AssetImage('assets/page_not_found.png'),
-                        fit: BoxFit.fitWidth),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FittedBox(
-                        fit: BoxFit.fitHeight,
-                        child: Text(
-                          "Caption :",
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.teal),
-                        ),
-                      ),
-                      FittedBox(
-                        fit: BoxFit.fitHeight,
-                        child: Text(
-                          '${meme.description}',
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontFamily: 'HandWriting',
-                              fontWeight: FontWeight.w600,
-                              color: Colors.tealAccent),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          )));
-    }
-    return cards;
-  }
-
-  ImageProvider _getImage(String url) {
-    var image;
-    try {
-      image = NetworkImage(url);
-    } catch (e) {
-      image = AssetImage('assets/page_not_found.png');
-    }
-    if (image == null) {
-      image = AssetImage('assets/page_not_found.png');
-    }
-    return image;
-  }
-
-  _buildLoadingView() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300],
-      highlightColor: Colors.grey[100],
-      child: GridView.count(
-        padding: EdgeInsets.all(0),
-        // padding: EdgeInsets.symmetric(
-        //     horizontal: SizeConfig.safeBlockHorizontal),
-        physics: NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        // Create a grid with 2 columns. If you change the scrollDirection to
-        // horizontal, this produces 2 rows.
-        crossAxisCount: 3,
-        childAspectRatio: 1.2,
-        crossAxisSpacing: 5,
-        mainAxisSpacing: 5,
-        children: List.generate(
-          100,
-          (int index) {
-            return Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white,
-              ),
-            );
-          },
+      body: Container(
+        padding: EdgeInsets.all(SizeConfig.inputSpacing / 1.9),
+        child: Row(
+          children: [
+            SizeConfig.screenWidth > 800 ? sideView() : Container(),
+            isOnSignIn ? SignIn() : SignUp()
+          ],
         ),
       ),
     );
   }
 
-  Future<void> _showEditDialog(int id) async {
-    String new_description, new_url;
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Edit this  Meme',
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-          ),
-          content: SingleChildScrollView(
-            child: Form(
-              key: _formkey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  TextFormField(
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'url is required';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      new_url = value;
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'edit url',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
+  Expanded SignUp() {
+    return Expanded(
+      flex: 2,
+      child: Container(
+        child: Card(
+          color: Color(0xFF303031),
+          child: Padding(
+            padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 2),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Sign Up",
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 3,
+                ),
+                Text(
+                  "Enter your details",
+                ),
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 7,
+                ),
+                Form(
+                  key: _formkey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      TextFormField(
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'required';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          icon: Icon(Icons.email),
+                          labelText: 'Email',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
                       ),
-                    ),
-                    keyboardType: TextInputType.url,
+                      SizedBox(
+                        height: SizeConfig.safeBlockVertical,
+                      ),
+                      // enter password
+                      TextFormField(
+                        controller: passwordSignUp,
+                        obscureText: true,
+                        keyboardType: TextInputType.visiblePassword,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Enter a Password';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          icon: Icon(Icons.lock),
+                          labelText: 'Password',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: SizeConfig.safeBlockVertical,
+                      ),
+                      // confirm password
+                      TextFormField(
+                        controller: passwordConfirmSignUp,
+                        obscureText: true,
+                        keyboardType: TextInputType.visiblePassword,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Enter the above password';
+                          }
+                          if (passwordSignUp != passwordConfirmSignUp) {
+                            return 'Passwords do not matched';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          icon: Icon(Icons.lock),
+                          labelText: 'Confirm Password',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return "Don\'t be shy speak up";
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      new_description = value;
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Change description',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
+                ),
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 6,
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                      SizeConfig.safeBlockHorizontal, 0, 10, 0),
+                  child: Container(
+                    height: 40,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xFF34b996),
                       ),
+                      child: Text("Sign Up"),
                     ),
                   ),
-                ],
-              ),
+                ),
+                // for mobile view logic SignUp
+                SizeConfig.screenWidth > 800
+                    ? Container()
+                    : Center(
+                        child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              if (isOnSignIn == true) {
+                                isOnSignIn = false;
+                              } else {
+                                isOnSignIn = true;
+                              }
+                            });
+                          },
+                          child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: SizeConfig.safeBlockHorizontal,
+                                  top: SizeConfig.safeBlockVertical),
+                              child: switchBetweenSignInSignUp()),
+                        ),
+                      ),
+              ],
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () async {
-                if (_formkey.currentState.validate()) {
-                  _formkey.currentState.save();
-
-                  bool isTrue = await _memeBloc.editMeme(Memes(
-                      id: id, url: new_url, description: new_description));
-
-                  if (isTrue) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Meme Edited'),
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Some Error Occured'),
-                      ),
-                    );
-                  }
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Text('Do It !!'),
-            ),
-            TextButton(
-              child: Text('Not Interested Anymore'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+        ),
+      ),
     );
   }
 
-  Future<void> _showDeleteDialog(int id) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Delete this  Meme',
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () async {
-                bool isTrue = await _memeBloc.deleteMeme(id);
-                if (isTrue) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Meme Deleted'),
+  // SignIn Widget
+  Expanded SignIn() {
+    return Expanded(
+      flex: 2,
+      child: Container(
+        child: Card(
+          color: Color(0xFF303031),
+          child: Padding(
+            padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 2),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Sign In ",
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 3,
+                ),
+                Text(
+                  "Enter your details",
+                  //style: TextStyle(fontSize: 20),
+                ),
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 7,
+                ),
+                Form(
+                  key: _formkey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      TextFormField(
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'required';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          icon: Icon(Icons.email),
+                          labelText: 'Email',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Password';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          icon: Icon(Icons.lock),
+                          labelText: 'Password',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        keyboardType: TextInputType.url,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 2,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Checkbox(value: false, onChanged: (v) {}),
+                        Text('Remember Me'),
+                      ],
                     ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Some Error Occured'),
+                    // logiv for mobile view
+                    TextButton(
+                        onPressed: () {
+                          if (isOnSignIn == true) {
+                            isOnSignIn = false;
+                          } else {
+                            isOnSignIn = true;
+                          }
+                        },
+                        child: switchBetweenSignInSignUp()),
+                  ],
+                ),
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 6,
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                      SizeConfig.safeBlockHorizontal, 0, 10, 0),
+                  child: Container(
+                    height: 40,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xFF34b996),
+                      ),
+                      child: Text("Login"),
                     ),
-                  );
-                }
-                Navigator.of(context).pop();
-              },
-              child: Text('Do It !!'),
+                  ),
+                ),
+                SizeConfig.screenWidth > 800
+                    ? Container()
+                    : Center(
+                        child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              if (isOnSignIn == true) {
+                                isOnSignIn = false;
+                              } else {
+                                isOnSignIn = true;
+                              }
+                            });
+                          },
+                          child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: SizeConfig.safeBlockHorizontal,
+                                  top: SizeConfig.safeBlockVertical),
+                              child: switchBetweenSignInSignUp()),
+                        ),
+                      ),
+              ],
             ),
-            Spacer(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Text switchBetweenSignInSignUp() {
+    if (isOnSignIn == true) {
+      return Text(
+        "dont't have a account ?",
+        style: TextStyle(
+            color: Colors.white, decoration: TextDecoration.underline),
+      );
+    } else {
+      return Text(
+        "Already have a account ?SignIn",
+        style: TextStyle(
+            color: Colors.white, decoration: TextDecoration.underline),
+      );
+    }
+  }
+
+  Expanded sideView() {
+    return Expanded(
+      flex: 3,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          gradient: LinearGradient(
+            begin: Alignment.bottomRight,
+            end: Alignment.topLeft,
+            colors: [
+              Color(0xFF22909f),
+              Color(0xFF24949d),
+              Color(0xFF279a9d),
+              Color(0xFF289e9b),
+              Color(0xFF2ba399),
+              Color(0xFF2da999),
+              Color(0xFF30af99),
+              Color(0xFF34b996),
+            ],
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: SizeConfig.blockSizeVertical * 5,
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: SizeConfig.blockSizeHorizontal),
+              child: Text(
+                "</> MemeShare",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              height: SizeConfig.blockSizeVertical * 9,
+            ),
+            Padding(
+              padding:
+                  EdgeInsets.only(left: SizeConfig.blockSizeHorizontal * 5),
+              child: Text(
+                "Laught .",
+                style: TextStyle(
+                  fontSize: 50,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: SizeConfig.blockSizeVertical * 4,
+            ),
+            Padding(
+              padding:
+                  EdgeInsets.only(left: SizeConfig.blockSizeHorizontal * 5),
+              child: Text(
+                "Share .",
+                style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              height: SizeConfig.blockSizeVertical * 4,
+            ),
+            Padding(
+              padding:
+                  EdgeInsets.only(left: SizeConfig.blockSizeHorizontal * 5),
+              child: Text(
+                "Support .",
+                style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              height: SizeConfig.blockSizeVertical * 4,
+            ),
+            /* Padding(
+              padding:
+                  EdgeInsets.only(left: SizeConfig.blockSizeHorizontal * 7),
+              child: Text(
+                "Spreading happiness one meme at a time !!",
+                style: TextStyle(fontSize: 20),
+              ),
+            ),*/
+            SizedBox(
+              height: SizeConfig.blockSizeVertical * 8,
+            ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                setState(() {
+                  if (isOnSignIn == true) {
+                    isOnSignIn = false;
+                  } else {
+                    isOnSignIn = true;
+                  }
+                });
               },
-              child: Text('Not Interested Anymore'),
-            )
+              child: Padding(
+                  padding: const EdgeInsets.only(left: 80),
+                  child: switchBetweenSignInSignUp()),
+            ),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 }

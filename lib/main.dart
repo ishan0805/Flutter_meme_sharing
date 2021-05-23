@@ -1,4 +1,5 @@
 import 'package:crio_meme_sharing_app/screens/create_meme.dart';
+import 'package:crio_meme_sharing_app/screens/feeds_page.dart';
 import 'package:crio_meme_sharing_app/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return Provider<MemeBloc>(
@@ -17,13 +19,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Meme Sharing',
-        theme: ThemeData.dark().copyWith(
-            textButtonTheme: TextButtonThemeData(
-                style: ButtonStyle(
-                    foregroundColor: MaterialStateProperty.resolveWith(
-                        (state) => Colors.white)))),
-        home: //CreateMeme(),
-            MyHomePage(title: 'Meme Sharing'),
+        theme: ThemeData.dark(),
+        home: FeedsPage(title: 'Meme Sharing'), // Home()
       ),
     );
   }

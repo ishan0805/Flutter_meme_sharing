@@ -142,11 +142,11 @@ class _CreateMemeState extends State<CreateMeme> {
             child: Container(
               width: deviceSize.width / 4,
               height: deviceSize.height / 15,
-              child: RaisedButton(
-                color: Colors.teal,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
+              child: ElevatedButton(
+                // RoundedRectangleBorder(
+                //    borderRadius: BorderRadius.circular(15),
+                //  ),
+                style: TextButton.styleFrom(primary: Colors.teal),
                 onPressed: () async {
                   if (_formkey.currentState.validate()) {
                     _formkey.currentState.save();
