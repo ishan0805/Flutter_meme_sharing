@@ -1,4 +1,5 @@
 import 'package:crio_meme_sharing_app/screens/create_meme.dart';
+import 'package:crio_meme_sharing_app/screens/error.dart';
 import 'package:crio_meme_sharing_app/screens/feeds_page.dart';
 import 'package:crio_meme_sharing_app/screens/home.dart';
 import 'package:flutter/material.dart';
