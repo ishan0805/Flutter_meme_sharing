@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:crio_meme_sharing_app/bloc/meme_bloc.dart';
 import 'package:crio_meme_sharing_app/models/meme.dart';
 import 'package:crio_meme_sharing_app/utilies/size_config.dart';
@@ -68,6 +66,7 @@ class _CreateMemeState extends State<CreateMeme> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
                                   TextFormField(
+                                    key: ValueKey('name'),
                                     validator: (value) {
                                       if (value.isEmpty) {
                                         return 'everyone has a name ';
@@ -88,6 +87,7 @@ class _CreateMemeState extends State<CreateMeme> {
                                   ),
                                   SizedBox(height: 10),
                                   TextFormField(
+                                    key: ValueKey('url'),
                                     validator: (value) {
                                       if (value.isEmpty) {
                                         return 'url is required';
@@ -108,6 +108,7 @@ class _CreateMemeState extends State<CreateMeme> {
                                   ),
                                   SizedBox(height: 10),
                                   TextFormField(
+                                    key: ValueKey('caption'),
                                     validator: (value) {
                                       if (value.isEmpty) {
                                         return "Don\'t be shy speak up";

@@ -1,3 +1,4 @@
+import 'package:crio_meme_sharing_app/route_generator.dart';
 import 'package:crio_meme_sharing_app/screens/create_meme.dart';
 import 'package:crio_meme_sharing_app/screens/error.dart';
 import 'package:crio_meme_sharing_app/screens/feeds_page.dart';
@@ -21,7 +22,8 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Meme Sharing',
         theme: ThemeData.dark(),
-        home: FeedsPage(title: 'Meme Sharing'), // Home()
+        initialRoute: '/feeds',
+        onGenerateRoute: RouteGenerator.generateRoute, // Home()
       ),
     );
   }

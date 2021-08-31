@@ -12,4 +12,6 @@ class ApiPaths {
   static final editMeme = '/memes';
   static final postMeme = '/memes';
   static final deleteMeme = '/memes';
+  static final signUp = '';
+  static final login = '';
 }

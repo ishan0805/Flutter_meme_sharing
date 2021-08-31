@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:developer' as developer;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'api_paths.dart';
 import 'app_exception.dart';
 import 'package:http/http.dart' as http;
 
 class ApiHelper implements ApiService {
   /// Storage key for the token
-  //final String _token = "token";
+  final String _token = "token";
 
   /// HTTP GET Request
   Future<dynamic> httpGet(String path) async {
@@ -114,11 +116,11 @@ class ApiHelper implements ApiService {
   }
 
   // TODO: Check if user is logged in and valid
-  /* Future<bool> handShake() async {
+  Future<bool> handShake() async {
     final token = await getToken();
     if (token != null) return true;
     return false;
-  }*/
+  }
 
   dynamic _returnResponse(http.Response response) async {
     switch (response.statusCode) {
@@ -147,7 +149,7 @@ class ApiHelper implements ApiService {
     }
   }
 
-  /*final storage = new FlutterSecureStorage();
+  final storage = FlutterSecureStorage();
 
   /// Method that returns the token from Shared Preferences
   Future<String> getToken() async {
@@ -161,14 +163,14 @@ class ApiHelper implements ApiService {
 
   Future<void> removeToken() async {
     await storage.delete(key: _token);
-  }*/
+  }
 }
 
 abstract class ApiService {
   Future<dynamic> httpGet(String path);
   Future<dynamic> httpPost(String path, Map<String, dynamic> body);
-  // Future<String> getToken();
-  // Future<void> setToken(String token);
-  // Future<void> removeToken();
-  // Future<bool> handShake();
+  Future<String> getToken();
+  Future<void> setToken(String token);
+  Future<void> removeToken();
+  Future<bool> handShake();
 }
