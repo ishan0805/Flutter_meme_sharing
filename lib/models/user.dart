@@ -3,20 +3,20 @@ import 'dart:convert';
 import 'package:crio_meme_sharing_app/models/meme.dart';
 
 class User {
-  final String name;
+  final String? name;
   final String email;
   final List<Memes> usermemes;
   User({
     this.name,
-    this.email,
-    this.usermemes,
+    required this.email,
+    required this.usermemes,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'name': name,
       'email': email,
-      'usermemes': usermemes?.map((x) => x.toMap())?.toList(),
+      'usermemes': usermemes.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -25,7 +25,7 @@ class User {
       name: map['name'],
       email: map['email'],
       usermemes:
-          List<Memes>.from(map['usermemes']?.map((x) => Memes.fromMap(x))),
+          List<Memes>.from(map['usermemes'].map((x) => Memes.fromMap(x))),
     );
   }
 

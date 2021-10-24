@@ -13,7 +13,7 @@ class MemeBloc {
 
   void getMemes() async {
     final event = await _repository.getMeme();
-    if (event != null) _memestream.sink.add(event);
+    _memestream.sink.add(event);
   }
 
   Future<bool> postMeme(Memes meme) async {

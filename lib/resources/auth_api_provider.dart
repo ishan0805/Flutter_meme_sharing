@@ -1,5 +1,9 @@
+import 'package:crio_meme_sharing_app/core/failures.dart';
 import 'package:crio_meme_sharing_app/utilies/api_helper.dart';
 import 'package:crio_meme_sharing_app/utilies/api_paths.dart';
+import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
+import 'package:hive/hive.dart';
 
 import 'auth_repository.dart';
 
@@ -8,19 +12,50 @@ class AuthApiProvider implements Source {
   bool production = true;
 
   /// Sign Up
-  Future<void> signUp(String email, String password) async {
+  Future<Either<Failures, Unit>> signUp(
+      String name, String email, String password) async {
     final jsonMap = {
       'email': email,
       'password': password,
+      'name': name,
     };
-    if (production) {
-      final jsonResponse = await _apiHelper.httpPost(
-        ApiPaths.signUp,
-        jsonMap,
-      );
 
-      await _apiHelper.setToken(jsonResponse['token']);
+    final jsonResponse = await _apiHelper.httpPost(
+      ApiPaths.signUp,
+      data: jsonMap,
+    );
+    if (jsonResponse is Failures) {
+      return left(jsonResponse);
     }
+    await _apiHelper.setToken(jsonResponse['token']);
+    await Hive.box('user').put('email', jsonResponse['email']);
+
+    return right(unit);
+  }
+
+  /// Login with email and password
+  Future<Either<Failures, Unit>> login(String email, String password) async {
+    FormData jsonMap = FormData.fromMap({
+      "username": email,
+      "password": password,
+    });
+
+    final jsonResponse = await _apiHelper.httpPost(
+      ApiPaths.login,
+      formData: jsonMap,
+    );
+
+    if (jsonResponse is Failures) {
+      return left(jsonResponse);
+    }
+    await _apiHelper.setToken(jsonResponse['access_token']);
+    await Hive.box('user').put('email', jsonResponse['email']);
+    return right(unit);
+  }
+
+  @override
+  Future<void> logout() async {
+    await _apiHelper.removeToken();
   }
 
   /// Google sign up
@@ -38,21 +73,6 @@ class AuthApiProvider implements Source {
 
     await _apiHelper.setToken(jsonResponse['token']);
   }*/
-
-  /// Login with email and password
-  Future<void> login(String email, String password) async {
-    final jsonMap = {
-      "email": email,
-      "password": password,
-    };
-
-    final jsonResponse = await _apiHelper.httpPost(
-      ApiPaths.login,
-      jsonMap,
-    );
-
-    await _apiHelper.setToken(jsonResponse['token']);
-  }
 
   /// Login with google
   /*Future<void> googleLogin(String idToken) async {

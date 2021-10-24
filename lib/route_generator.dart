@@ -3,7 +3,7 @@ import 'package:crio_meme_sharing_app/screens/home.dart';
 import 'package:flutter/material.dart';
 
 class RouteGenerator {
-  static Route<dynamic> generateRoute(RouteSettings settings) {
+  static Route<dynamic>? generateRoute(RouteSettings settings) {
     final args = settings.arguments;
     switch (settings.name) {
       case '/':
@@ -22,7 +22,8 @@ class Error extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text("ErrorPage"),
+        child: Text(
+            "SomeThing Went Wrong , Maybe developer was running low on coffee "),
       ),
     );
   }

@@ -1,11 +1,11 @@
 import 'package:crio_meme_sharing_app/bloc/meme_bloc.dart';
 import 'package:crio_meme_sharing_app/screens/create_meme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-Widget CreateMemeScreen() => Provider<MemeBloc>(
-      create: (_) => MemeBloc(),
+import 'package:flutter_test/flutter_test.dart';
+
+Widget CreateMemeScreen() => ProviderScope(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Meme Sharing',
@@ -56,7 +56,7 @@ void main() {
       final Form formWidget = tester.widget(formWidgetFinder) as Form;
       final GlobalKey<FormState> formKey =
           formWidget.key as GlobalKey<FormState>;
-      expect(formKey.currentState.validate(), isFalse);
+      expect(formKey.currentState!.validate(), isFalse);
     });
     testWidgets(
         "Testing if CreateMemeScreen shows up validations on submission on fields with data",
@@ -74,7 +74,7 @@ void main() {
       final Form formWidget = tester.widget(formWidgetFinder) as Form;
       final GlobalKey<FormState> formKey =
           formWidget.key as GlobalKey<FormState>;
-      expect(formKey.currentState.validate(), isTrue);
+      expect(formKey.currentState!.validate(), isTrue);
     });
   });
 }

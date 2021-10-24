@@ -1,8 +1,10 @@
+import 'package:crio_meme_sharing_app/core/providers.dart';
 import 'package:crio_meme_sharing_app/utilies/size_config.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/src/provider.dart';
 
 class Home extends StatefulWidget {
-  Home({Key key}) : super(key: key);
+  Home({Key? key}) : super(key: key);
 
   @override
   _HomeState createState() => _HomeState();
@@ -14,159 +16,200 @@ class _HomeState extends State<Home> {
   bool isOnSignIn = false;
   TextEditingController passwordSignUp = TextEditingController();
   TextEditingController passwordConfirmSignUp = TextEditingController();
+  TextEditingController emailSignUp = TextEditingController();
+  TextEditingController emailSignIn = TextEditingController();
+  TextEditingController passwordSignIn = TextEditingController();
+  TextEditingController nameSignUp = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     size.init(context); //Initializing size of page
 
     return Scaffold(
-      body: Container(
+      body: Padding(
         padding: EdgeInsets.all(SizeConfig.inputSpacing / 1.9),
-        child: Row(
-          children: [
-            SizeConfig.screenWidth > 800 ? sideView() : Container(),
-            isOnSignIn ? SignIn() : SignUp()
-          ],
+        child: SizedBox(
+          height: SizeConfig.screenHeight,
+          child: Row(
+            children: [
+              SizeConfig.screenWidth > 800 ? sideView() : SizedBox(),
+              isOnSignIn ? SignIn() : SignUp()
+            ],
+          ),
         ),
       ),
     );
   }
 
+  // ignore: non_constant_identifier_names
   Expanded SignUp() {
     return Expanded(
       flex: 2,
       child: Container(
-        child: Card(
-          color: Color(0xFF303031),
-          child: Padding(
-            padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 2),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Sign Up",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: SizeConfig.blockSizeVertical * 3,
-                ),
-                Text(
-                  "Enter your details",
-                ),
-                SizedBox(
-                  height: SizeConfig.blockSizeVertical * 7,
-                ),
-                Form(
-                  key: _formkey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      TextFormField(
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'required';
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          icon: Icon(Icons.email),
-                          labelText: 'Email',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
+        color: Color(0xFF303031),
+        child: Padding(
+          padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Sign Up",
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeVertical * 3,
+              ),
+              Text(
+                "Enter your details",
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeVertical * 7,
+              ),
+              Form(
+                key: _formkey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    TextFormField(
+                      controller: nameSignUp,
+                      validator: (value) {
+                        if (value == null || value == '') {
+                          return 'required';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.email),
+                        labelText: 'Name',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      SizedBox(
-                        height: SizeConfig.safeBlockVertical,
-                      ),
-                      // enter password
-                      TextFormField(
-                        controller: passwordSignUp,
-                        obscureText: true,
-                        keyboardType: TextInputType.visiblePassword,
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Enter a Password';
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          icon: Icon(Icons.lock),
-                          labelText: 'Password',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: SizeConfig.safeBlockVertical,
-                      ),
-                      // confirm password
-                      TextFormField(
-                        controller: passwordConfirmSignUp,
-                        obscureText: true,
-                        keyboardType: TextInputType.visiblePassword,
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Enter the above password';
-                          }
-                          if (passwordSignUp != passwordConfirmSignUp) {
-                            return 'Passwords do not matched';
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          icon: Icon(Icons.lock),
-                          labelText: 'Confirm Password',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: SizeConfig.blockSizeVertical * 6,
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      SizeConfig.safeBlockHorizontal, 0, 10, 0),
-                  child: Container(
-                    height: 40,
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF34b996),
-                      ),
-                      child: Text("Sign Up"),
                     ),
-                  ),
-                ),
-                // for mobile view logic SignUp
-                SizeConfig.screenWidth > 800
-                    ? Container()
-                    : Center(
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              if (isOnSignIn == true) {
-                                isOnSignIn = false;
-                              } else {
-                                isOnSignIn = true;
-                              }
-                            });
-                          },
-                          child: Padding(
-                              padding: EdgeInsets.only(
-                                  left: SizeConfig.safeBlockHorizontal,
-                                  top: SizeConfig.safeBlockVertical),
-                              child: switchBetweenSignInSignUp()),
+                    SizedBox(
+                      height: SizeConfig.safeBlockVertical,
+                    ),
+                    TextFormField(
+                      controller: emailSignUp,
+                      validator: (value) {
+                        if (value == null || value == '') {
+                          return 'required';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.email),
+                        labelText: 'Email',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-              ],
-            ),
+                    ),
+                    SizedBox(
+                      height: SizeConfig.safeBlockVertical,
+                    ),
+                    // enter password
+                    TextFormField(
+                      controller: passwordSignUp,
+                      obscureText: true,
+                      keyboardType: TextInputType.visiblePassword,
+                      validator: (value) {
+                        if (value == null || value == '') {
+                          return 'Enter a Password';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.lock),
+                        labelText: 'Password',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: SizeConfig.safeBlockVertical,
+                    ),
+                    // confirm password
+                    TextFormField(
+                      controller: passwordConfirmSignUp,
+                      obscureText: true,
+                      keyboardType: TextInputType.visiblePassword,
+                      validator: (value) {
+                        if (value == null || value == '') {
+                          return 'Enter the above password';
+                        }
+                        if (passwordSignUp.text != passwordConfirmSignUp.text) {
+                          return 'Passwords do not matched';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.lock),
+                        labelText: 'Confirm Password',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeVertical * 6,
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                    SizeConfig.safeBlockHorizontal, 0, 10, 0),
+                child: Container(
+                  height: 40,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_formkey.currentState!.validate()) {
+                        final result = await context
+                            .read(authBlocProvider)
+                            .signUp(nameSignUp.text, emailSignUp.text,
+                                passwordConfirmSignUp.text);
+                        result.fold((l) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(l.message)),
+                          );
+                        }, (r) {
+                          Navigator.pushNamed(context, '/feeds');
+                        });
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Color(0xFF34b996),
+                    ),
+                    child: Text("Sign Up"),
+                  ),
+                ),
+              ),
+              // for mobile view logic SignUp
+              SizeConfig.screenWidth > 800
+                  ? Container()
+                  : Center(
+                      child: TextButton(
+                        onPressed: () {
+                          setState(() {
+                            if (isOnSignIn == true) {
+                              isOnSignIn = false;
+                            } else {
+                              isOnSignIn = true;
+                            }
+                          });
+                        },
+                        child: Padding(
+                            padding: EdgeInsets.only(
+                                left: SizeConfig.safeBlockHorizontal,
+                                top: SizeConfig.safeBlockVertical),
+                            child: switchBetweenSignInSignUp()),
+                      ),
+                    ),
+            ],
           ),
         ),
       ),
@@ -206,10 +249,13 @@ class _HomeState extends State<Home> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       TextFormField(
+                        controller: emailSignIn,
                         validator: (value) {
-                          if (value.isEmpty) {
-                            return 'required';
+                          if (value == null || value == '') {
+                            return 'Required';
                           }
+                          if (!value.contains('@'))
+                            return "Enter a Valid email";
                           return null;
                         },
                         decoration: InputDecoration(
@@ -222,8 +268,9 @@ class _HomeState extends State<Home> {
                       ),
                       SizedBox(height: 20),
                       TextFormField(
+                        controller: passwordSignIn,
                         validator: (value) {
-                          if (value.isEmpty) {
+                          if (value == null || value == '') {
                             return 'Password';
                           }
                           return null;
@@ -277,7 +324,20 @@ class _HomeState extends State<Home> {
                     height: 40,
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        if (_formkey.currentState!.validate()) {
+                          final result = await context
+                              .read(authBlocProvider)
+                              .login(emailSignIn.text, passwordSignIn.text);
+                          result.fold((l) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l.message)),
+                            );
+                          }, (r) {
+                            Navigator.pushNamed(context, '/feeds');
+                          });
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         primary: Color(0xFF34b996),
                       ),

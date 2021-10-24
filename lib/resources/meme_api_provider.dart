@@ -16,27 +16,16 @@ class MemeApiProvider {
           print(each);
         }
       }
-    } else {
-      memes.add(
-        Memes(
-            name: "Ishan",
-            id: 2,
-            url:
-                'https://static0.srcdn.com/wordpress/wp-content/uploads/2020/11/I-Had-Fun-Once-It-Was-Awful-amp-9-Other-Classic-Memes.jpg'),
-      );
-      memes.add(Memes(
-          name: "Ishan",
-          id: 2,
-          url:
-              'https://static0.srcdn.com/wordpress/wp-content/uploads/2020/11/I-Had-Fun-Once-It-Was-Awful-amp-9-Other-Classic-Memes.jpg'));
-    }
+    } else {}
     return memes;
   }
 
   Future<bool> postMeme(Memes meme) async {
-    Map<String, dynamic> m = meme.toMap();
+    Map<String, dynamic> data = meme.toMap();
 
-    await _apiHelper.httpPost(ApiPaths.postMeme, m).catchError((onError) {
+    await _apiHelper
+        .httpPost(ApiPaths.postMeme, data: data)
+        .catchError((onError) {
       return false;
     });
 
@@ -44,9 +33,9 @@ class MemeApiProvider {
   }
 
   Future<bool> editMeme(Memes meme) async {
-    Map<String, String> m = {'url': meme.url, 'caption': meme.description};
+    Map<String, dynamic> data = meme.toMap();
     await _apiHelper
-        .httpPut('${ApiPaths.editMeme}/${meme.id}', m)
+        .httpPut('${ApiPaths.editMeme}/${meme.id}', data)
         .catchError((onError) {
       return false;
     });

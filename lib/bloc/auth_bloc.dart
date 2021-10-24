@@ -1,14 +1,17 @@
+import 'package:crio_meme_sharing_app/core/failures.dart';
 import 'package:crio_meme_sharing_app/resources/auth_repository.dart';
+import 'package:dartz/dartz.dart';
 
 class AuthBloc {
   AuthRepository _authRepository = AuthRepository();
 
-  Future<void> login(String email, String password) async {
-    await _authRepository.login(email, password);
+  Future<Either<Failures, Unit>> login(String email, String password) async {
+    return await _authRepository.login(email, password);
   }
 
-  Future<void> signUp(String email, String password) async {
-    await _authRepository.signUp(email, password);
+  Future<Either<Failures, Unit>> signUp(
+      String name, String email, String password) async {
+    return await _authRepository.signUp(name, email, password);
   }
 
   /*Future<void> googleLogin(String idToken) async {
@@ -34,9 +37,9 @@ class AuthBloc {
   /// Reset password if the user has forgotten it
   Future<void> resetPassword(String password) async {
     await _authRepository.resetPassword(password);
-  }
+  }*/
 
   Future<void> logout() async {
     await _authRepository.logout();
-  }*/
+  }
 }
