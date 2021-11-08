@@ -1,4 +1,5 @@
 import 'package:crio_meme_sharing_app/bloc/meme_bloc.dart';
+import 'package:crio_meme_sharing_app/core/failures.dart';
 import 'package:crio_meme_sharing_app/core/providers.dart';
 import 'package:crio_meme_sharing_app/models/meme.dart';
 import 'package:crio_meme_sharing_app/screens/create_meme.dart';
@@ -12,11 +13,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/src/provider.dart';
 import 'package:hive/hive.dart';
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+//import 'dart:html' as html;
 
 //import 'dart:js' as js;
 // ignore: import_of_legacy_library_into_null_safe
-import 'package:shimmer/shimmer.dart';
+//import 'package:shimmer/shimmer.dart';
 
 class FeedsPage extends StatefulWidget {
   final String? title;
@@ -419,22 +420,12 @@ class _FeedsPageState extends State<FeedsPage> {
                 if (_formkey.currentState!.validate()) {
                   _formkey.currentState!.save();
 
-                  bool isTrue = await _memeBloc.editMeme(
-                      Memes(id: id, url: new_url, caption: new_description));
+                  final response = (await _memeBloc.editMeme(Memes(
+                          id: id, url: new_url, caption: new_description)))
+                      .fold((l) => l, (r) => r);
 
-                  if (isTrue) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Meme Edited'),
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Some Error Occured'),
-                      ),
-                    );
-                  }
+                  showError(response, context);
+
                   Navigator.of(context).pop();
                 }
               },
@@ -452,8 +443,24 @@ class _FeedsPageState extends State<FeedsPage> {
     );
   }
 
+  void showError(Object response, BuildContext context) {
+    if (response is Failures) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.message),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text("Success"),
+        ),
+      );
+    }
+  }
+
   void htmlOpenLink(String url) {
-    html.window.open(url, '_blank');
+    // html.window.open(url, '_blank');
   }
 
   Future<void> _showDeleteDialog(int id) async {

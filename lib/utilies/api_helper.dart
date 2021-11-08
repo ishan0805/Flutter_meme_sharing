@@ -10,7 +10,7 @@ import 'api_paths.dart';
 
 class ApiHelper implements ApiService {
   /// Storage key for the token
-  String _token = 'token';
+  String _token = '';
   late Dio _dio;
 
   ApiHelper() {
@@ -32,7 +32,7 @@ class ApiHelper implements ApiService {
       developer.log('GET ${ApiPaths.baseUrl}$path', name: 'network request');
       final response = await _dio.get('$path',
           options: Options(headers: {
-            if (_token != null) "Authorization": "Bearer $_token",
+            "Authorization": "Bearer $_token",
           }));
       developer.log(response.data.toString(), name: 'network response');
 
@@ -41,7 +41,7 @@ class ApiHelper implements ApiService {
       responseJson = _returnResponse(response);
       return responseJson;
     } on DioError catch (e) {
-      if (e.runtimeType == SocketException)
+      if (e.error.runtimeType == SocketException)
         return Failures("No internet connection");
       responseJson = await _returnResponse(e.response);
     }
@@ -60,14 +60,14 @@ class ApiHelper implements ApiService {
       developer.log('DELETE ${ApiPaths.baseUrl}$path', name: 'network request');
       final response = await _dio.delete('$path',
           options: Options(headers: {
-            if (_token != null) "Authorization": "Bearer $_token",
+            "Authorization": "Bearer $_token",
           }));
       developer.log(response.statusCode.toString(), name: 'network response');
 
       print(response.statusCode);
       responseJson = _returnResponse(response);
     } on DioError catch (e) {
-      if (e.runtimeType == SocketException)
+      if (e.error.runtimeType == SocketException)
         return Failures("No internet connection");
       responseJson = await _returnResponse(e.response);
     }
@@ -82,7 +82,7 @@ class ApiHelper implements ApiService {
   }) async {
     var responseJson;
     _token = await getToken();
-    print(jsonEncode(data));
+    //print(jsonEncode(data));
     try {
       // final token = await getToken();
 
@@ -94,7 +94,7 @@ class ApiHelper implements ApiService {
         '$path',
         options: Options(headers: {
           //"Content-Type": "application/json",
-          if (_token != null) "Authorization": "Bearer $_token",
+          if (_token != "") "Authorization": "Bearer $_token",
           'Accept': '*/*',
           'Accept-Encoding': 'gzip, deflate, br'
         }),
@@ -104,7 +104,7 @@ class ApiHelper implements ApiService {
       responseJson = response.data;
       //print(responseJson.toString());
     } on DioError catch (e) {
-      if (e.runtimeType == SocketException)
+      if (e.error.runtimeType == SocketException)
         return Failures("No internet connection");
       responseJson = await _returnResponse(e.response);
     }
@@ -117,25 +117,24 @@ class ApiHelper implements ApiService {
     var responseJson;
     _token = await getToken();
     try {
-      //  final token = await getToken();
-
-      //  print(token);
-
       developer.log('PUT ${ApiPaths.baseUrl}$path', name: 'network request');
       final response = await _dio.patch(
         '$path',
         options: Options(headers: {
           "Content-Type": "application/json",
-          if (_token != null) "Token": _token,
+          "Authorization": "Bearer $_token",
         }),
         data: jsonEncode(data),
       );
-      developer.log(response.data, name: 'network response');
+
+      developer.log(response.data.toString(), name: 'network response');
 
       responseJson = await _returnResponse(response);
-    } catch (e) {
-      if (e.runtimeType == SocketException)
+    } on DioError catch (e) {
+      if (e.error.runtimeType == SocketException)
         return Failures("No internet connection");
+      responseJson = await _returnResponse(e.response);
+      return responseJson;
     }
     return responseJson;
   }
@@ -143,7 +142,7 @@ class ApiHelper implements ApiService {
   // TODO: Check if user is logged in and valid
   Future<bool> handShake() async {
     final token = await getToken();
-    if (token != null) return true;
+    if (token != "") return true;
     return false;
   }
 
@@ -161,7 +160,7 @@ class ApiHelper implements ApiService {
         return Failures(response.data['message']);
 
       case 401:
-        return Failures(response.data['message']);
+        return Failures("UnAuthenticated");
 
       case 404:
         return Failures(response.data['message']);
@@ -169,10 +168,11 @@ class ApiHelper implements ApiService {
         return Failures(response.data['message']);
 
       case 500:
+        return Failures('Server Error');
+
       default:
         return Failures(
             'Error occured while Communication with Server with StatusCode : ${response.statusCode}');
-        break;
     }
   }
 
@@ -180,7 +180,7 @@ class ApiHelper implements ApiService {
 
   /// Method that returns the token from Shared Preferences
   Future<String> getToken() async {
-    return await storage.get('token') ?? 'token';
+    return await storage.get('token') ?? '';
   }
 
   /// Method that saves the token in Shared Preferences

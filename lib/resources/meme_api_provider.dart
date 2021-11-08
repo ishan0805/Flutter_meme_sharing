@@ -1,7 +1,8 @@
+import 'package:crio_meme_sharing_app/core/failures.dart';
 import 'package:crio_meme_sharing_app/models/meme.dart';
 import 'package:crio_meme_sharing_app/utilies/api_helper.dart';
 import 'package:crio_meme_sharing_app/utilies/api_paths.dart';
-import 'package:http/http.dart' as http;
+import 'package:dartz/dartz.dart';
 
 class MemeApiProvider {
   ApiHelper _apiHelper = ApiHelper();
@@ -32,14 +33,15 @@ class MemeApiProvider {
     return true;
   }
 
-  Future<bool> editMeme(Memes meme) async {
+  Future<Either<Failures, Unit>> editMeme(Memes meme) async {
     Map<String, dynamic> data = meme.toMap();
-    await _apiHelper
-        .httpPut('${ApiPaths.editMeme}/${meme.id}', data)
-        .catchError((onError) {
-      return false;
-    });
-    return true;
+
+    final response =
+        await _apiHelper.httpPut('${ApiPaths.editMeme}/${meme.id}', data);
+
+    if (response is Failures) return left(response);
+
+    return right(unit);
   }
 
   Future<bool> deleteMeme(int id) async {
