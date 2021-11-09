@@ -1,36 +1,35 @@
 import 'dart:convert';
 
 class Memes {
-  final String url;
-  final String name;
-  final String description;
-  final int id;
+  final String? url;
+
+  final String? caption;
+  final int? id;
+  final String? ownerEmail;
+  final String? ownerName;
 
   Memes({
     this.id,
     this.url,
-    this.name,
-    this.description,
+    this.caption,
+    this.ownerEmail,
+    this.ownerName,
   });
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'name': name,
       'url': url,
-      'caption': description,
+      'caption': caption,
     };
   }
 
   factory Memes.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return Memes(
-      id: map['id'],
-      url: map['url'],
-      name: map['name'],
-      description: map['caption'],
-    );
+        id: map['id'],
+        url: map['url'],
+        caption: map['caption'],
+        ownerEmail: map['owner']['email'],
+        ownerName: map['owner']['name']);
   }
 
   String toJson() => json.encode(toMap());

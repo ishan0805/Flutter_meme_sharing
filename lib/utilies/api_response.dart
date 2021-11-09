@@ -1,4 +1,4 @@
-class ApiResponse<T> {
+/*class ApiResponse<T> {
   Status status;
   T data;
   String message;
@@ -13,4 +13,4 @@ class ApiResponse<T> {
   }
 }
 
-enum Status { LOADING, COMPLETED, ERROR }
+enum Status { LOADING, COMPLETED, ERROR }*/

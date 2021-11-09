@@ -1,13 +1,15 @@
-import 'package:crio_meme_sharing_app/screens/create_meme.dart';
-import 'package:crio_meme_sharing_app/screens/error.dart';
-import 'package:crio_meme_sharing_app/screens/feeds_page.dart';
-import 'package:crio_meme_sharing_app/screens/home.dart';
+import 'package:crio_meme_sharing_app/route_generator.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'bloc/meme_bloc.dart';
+import 'package:hive/hive.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() {
-  runApp(MyApp());
+import 'package:hive_flutter/hive_flutter.dart';
+
+Future<void> main() async {
+  await Hive.initFlutter();
+  await Hive.openBox('user');
+
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -15,14 +17,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Provider<MemeBloc>(
-      create: (_) => MemeBloc(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Meme Sharing',
-        theme: ThemeData.dark(),
-        home: FeedsPage(title: 'Meme Sharing'), // Home()
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Meme Sharing',
+      theme: ThemeData(
+          brightness: Brightness.dark,
+          //primaryColor: Colors.white,
+          // hoverColor: Colors.white,
+          //focusColor: Colors.white,
+          textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(primary: Color(0xFF2ba399))),
+          buttonTheme: ButtonThemeData(
+            buttonColor: Color(0xFF2ba399),
+            textTheme: ButtonTextTheme.primary,
+          ),
+          //primarySwatch: MaterialColor(500,{''}),
+          primaryColorBrightness: Brightness.dark),
+      initialRoute: (Hive.box('user').get('token') == null) ? '/' : '/feeds',
+      onGenerateRoute: RouteGenerator.generateRoute, // Home()
     );
   }
 }

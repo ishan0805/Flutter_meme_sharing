@@ -1,13 +1,12 @@
-import 'dart:io';
-
 import 'package:crio_meme_sharing_app/bloc/meme_bloc.dart';
+import 'package:crio_meme_sharing_app/core/providers.dart';
 import 'package:crio_meme_sharing_app/models/meme.dart';
-import 'package:crio_meme_sharing_app/utilies/size_config.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 
 class CreateMeme extends StatefulWidget {
-  CreateMeme({Key key}) : super(key: key);
+  CreateMeme({Key? key}) : super(key: key);
 
   @override
   _CreateMemeState createState() => _CreateMemeState();
@@ -16,13 +15,18 @@ class CreateMeme extends StatefulWidget {
 class _CreateMemeState extends State<CreateMeme> {
   final _formkey = GlobalKey<FormState>();
 
-  MemeBloc _memeBloc;
-  String name, url, description;
+  MemeBloc? _memeBloc;
+  String? name, url, description;
+  @override
+  void initState() {
+    super.initState();
+    _memeBloc = context.read(memeBlocProvider);
+  }
 
   @override
   Widget build(BuildContext context) {
     var deviceSize = MediaQuery.of(context).size;
-    _memeBloc = Provider.of<MemeBloc>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Create Meme'),
@@ -67,7 +71,8 @@ class _CreateMemeState extends State<CreateMeme> {
                                     MainAxisAlignment.spaceEvenly,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
-                                  TextFormField(
+                                  /*TextFormField(
+                                    key: ValueKey('name'),
                                     validator: (value) {
                                       if (value.isEmpty) {
                                         return 'everyone has a name ';
@@ -85,17 +90,18 @@ class _CreateMemeState extends State<CreateMeme> {
                                         borderRadius: BorderRadius.circular(15),
                                       ),
                                     ),
-                                  ),
+                                  ),*/
                                   SizedBox(height: 10),
                                   TextFormField(
+                                    key: ValueKey('url'),
                                     validator: (value) {
-                                      if (value.isEmpty) {
+                                      if (value == null) {
                                         return 'url is required';
                                       }
                                       return null;
                                     },
                                     onSaved: (value) {
-                                      url = value;
+                                      url = value ?? "";
                                     },
                                     decoration: InputDecoration(
                                       icon: Icon(Icons.link),
@@ -108,14 +114,15 @@ class _CreateMemeState extends State<CreateMeme> {
                                   ),
                                   SizedBox(height: 10),
                                   TextFormField(
+                                    key: ValueKey('caption'),
                                     validator: (value) {
-                                      if (value.isEmpty) {
+                                      if (value == null) {
                                         return "Don\'t be shy speak up";
                                       }
                                       return null;
                                     },
                                     onSaved: (value) {
-                                      description = value;
+                                      description = value ?? "";
                                     },
                                     decoration: InputDecoration(
                                       icon: Icon(Icons.message),
@@ -148,14 +155,14 @@ class _CreateMemeState extends State<CreateMeme> {
                 //  ),
                 style: TextButton.styleFrom(primary: Colors.teal),
                 onPressed: () async {
-                  if (_formkey.currentState.validate()) {
-                    _formkey.currentState.save();
+                  if (_formkey.currentState!.validate()) {
+                    _formkey.currentState!.save();
                     //print("here");
                     //print(description);
-                    Memes meme =
-                        Memes(url: url, name: name, description: description);
+                    //name = await Hive.box('user').get('email');
+                    Memes meme = Memes(url: url, caption: description);
 
-                    bool isTrue = await _memeBloc.postMeme(meme);
+                    bool isTrue = await _memeBloc!.postMeme(meme);
                     if (isTrue) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -169,7 +176,6 @@ class _CreateMemeState extends State<CreateMeme> {
                         ),
                       );
                     }
-                    Navigator.pop(context);
                     Navigator.pop(context);
                   }
                 },

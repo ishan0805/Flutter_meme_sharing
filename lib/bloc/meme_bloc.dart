@@ -1,5 +1,7 @@
+import 'package:crio_meme_sharing_app/core/failures.dart';
 import 'package:crio_meme_sharing_app/models/meme.dart';
 import 'package:crio_meme_sharing_app/resources/meme_repository.dart';
+import 'package:dartz/dartz.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MemeBloc {
@@ -13,7 +15,7 @@ class MemeBloc {
 
   void getMemes() async {
     final event = await _repository.getMeme();
-    if (event != null) _memestream.sink.add(event);
+    _memestream.sink.add(event);
   }
 
   Future<bool> postMeme(Memes meme) async {
@@ -25,12 +27,13 @@ class MemeBloc {
     // _memestream.sink.add(event);
   }
 
-  Future<bool> editMeme(Memes meme) async {
+  Future<Either<Failures, Unit>> editMeme(Memes meme) async {
     final event = await _repository.editMeme(meme);
-    if (event) {
+    print(event);
+    return event.fold((l) => left(l), (r) {
       getMemes();
-    }
-    return event;
+      return right(unit);
+    });
   }
 
   Future<bool> deleteMeme(int id) async {
