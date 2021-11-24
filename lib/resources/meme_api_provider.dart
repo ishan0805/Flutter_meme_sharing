@@ -21,16 +21,13 @@ class MemeApiProvider {
     return memes;
   }
 
-  Future<bool> postMeme(Memes meme) async {
+  Future<Either<Failures, Unit>> postMeme(Memes meme) async {
     Map<String, dynamic> data = meme.toMap();
 
-    await _apiHelper
-        .httpPost(ApiPaths.postMeme, data: data)
-        .catchError((onError) {
-      return false;
-    });
+    final response = await _apiHelper.httpPost(ApiPaths.postMeme, data: data);
+    if (response is Failures) return left(response);
 
-    return true;
+    return right(unit);
   }
 
   Future<Either<Failures, Unit>> editMeme(Memes meme) async {
@@ -44,12 +41,10 @@ class MemeApiProvider {
     return right(unit);
   }
 
-  Future<bool> deleteMeme(int id) async {
-    await _apiHelper
-        .httpDelete('${ApiPaths.deleteMeme}/$id')
-        .catchError((onError) {
-      return false;
-    });
-    return true;
+  Future<Either<Failures, Unit>> deleteMeme(int id) async {
+    final response = await _apiHelper.httpDelete('${ApiPaths.deleteMeme}/$id');
+    if (response is Failures) return left(response);
+
+    return right(unit);
   }
 }

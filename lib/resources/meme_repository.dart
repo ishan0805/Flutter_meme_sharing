@@ -9,7 +9,7 @@ class MemeRepository {
     return _apiProvider.getMeme();
   }
 
-  Future<bool> postMeme(Memes meme) {
+  Future<Either<Failures, Unit>> postMeme(Memes meme) {
     return _apiProvider.postMeme(meme);
   }
 
@@ -17,7 +17,7 @@ class MemeRepository {
     return _apiProvider.editMeme(meme);
   }
 
-  Future<bool> deleteMeme(int id) {
+  Future<Either<Failures, Unit>> deleteMeme(int id) {
     return _apiProvider.deleteMeme(id);
   }
 }

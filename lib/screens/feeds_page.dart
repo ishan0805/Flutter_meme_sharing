@@ -12,6 +12,7 @@ import 'package:flutter/rendering.dart';
 // ignore: implementation_imports
 import 'package:flutter_riverpod/src/provider.dart';
 import 'package:hive/hive.dart';
+import 'package:url_launcher/url_launcher.dart';
 // ignore: avoid_web_libraries_in_flutter
 //import 'dart:html' as html;
 
@@ -49,6 +50,10 @@ class _FeedsPageState extends State<FeedsPage> {
     });
   }
 
+  void _launchURL(String url) async {
+    if (!await launch(url)) throw 'Could not launch $url';
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -61,10 +66,12 @@ class _FeedsPageState extends State<FeedsPage> {
           ListTile(
             title: Text('Post Meme'),
             leading: Icon(Icons.add_box),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
+            onTap: () async {
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) {
                 return CreateMeme();
               }));
+              Navigator.pop(context);
 
               // _showMyDialog();
             },
@@ -76,7 +83,7 @@ class _FeedsPageState extends State<FeedsPage> {
               /* js.context.callMethod('open', [
                 'https://memesharing.herokuapp.com/swagger-ui/#/default/get_memes_get'
               ]);*/
-              htmlOpenLink(
+              _launchURL(
                   'https://memesharing.herokuapp.com/swagger-ui/#/default/get_memes_get');
               Navigator.pop(context);
             },
@@ -87,7 +94,17 @@ class _FeedsPageState extends State<FeedsPage> {
             onTap: () {
               /* js.context.callMethod(
                   'open', ['https://www.linkedin.com/in/ishan0805/']);*/
-              htmlOpenLink('https://www.linkedin.com/in/ishan0805/');
+              _launchURL('https://www.linkedin.com/in/ishan0805/');
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.logout),
+            title: Text('Logout'),
+            onTap: () {
+              context.read(authBlocProvider).logout();
+
+              Navigator.pop(context);
               Navigator.pop(context);
             },
           ),
@@ -112,7 +129,7 @@ class _FeedsPageState extends State<FeedsPage> {
                 ),
                 TextButton(
                     onPressed: () {
-                      htmlOpenLink(
+                      _launchURL(
                           'https://memesharing.herokuapp.com/swagger-ui/#/default/get_memes_get');
                     },
                     child: Text('See Documents For Api')),
@@ -121,7 +138,7 @@ class _FeedsPageState extends State<FeedsPage> {
                 ),
                 TextButton(
                     onPressed: () {
-                      htmlOpenLink('https://www.linkedin.com/in/ishan0805/');
+                      _launchURL('https://www.linkedin.com/in/ishan0805/');
                     },
                     child: Text('Contact Us')),
                 SizedBox(
@@ -150,7 +167,9 @@ class _FeedsPageState extends State<FeedsPage> {
 
             return Center(
               child: SizedBox(
-                width: SizeConfig.screenWidth / 3,
+                width: SizeConfig.screenWidth < 500
+                    ? SizeConfig.screenWidth
+                    : SizeConfig.screenWidth / 3,
                 child: ListView.builder(
                   //controller: _scrollController,
                   // physics: NeverScrollableScrollPhysics(),
@@ -376,7 +395,7 @@ class _FeedsPageState extends State<FeedsPage> {
                 children: <Widget>[
                   TextFormField(
                     validator: (value) {
-                      if (value == null) {
+                      if (value == null || value == '') {
                         return 'url is required';
                       }
                       return null;
@@ -395,7 +414,7 @@ class _FeedsPageState extends State<FeedsPage> {
                   SizedBox(height: 10),
                   TextFormField(
                     validator: (value) {
-                      if (value == null) {
+                      if (value == null || value == '') {
                         return "Don\'t be shy speak up";
                       }
                       return null;
@@ -468,44 +487,28 @@ class _FeedsPageState extends State<FeedsPage> {
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return Container(
-          height: SizeConfig.screenHeight / 2,
-          width: SizeConfig.screenWidth / 3,
-          child: AlertDialog(
-            title: Text(
-              'Delete this  Meme',
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () async {
-                  bool isTrue = await _memeBloc.deleteMeme(id);
-                  if (isTrue) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Meme Deleted'),
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Some Error Occured'),
-                      ),
-                    );
-                  }
-                  Navigator.of(context).pop();
-                },
-                child: Text('Do It !!'),
-              ),
-              Spacer(),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('Not Interested Anymore'),
-              ),
-            ],
+        return AlertDialog(
+          title: Text(
+            'Delete this  Meme',
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                final response =
+                    (await _memeBloc.deleteMeme(id)).fold((l) => l, (r) => r);
+                showError(response, context);
+                Navigator.of(context).pop();
+              },
+              child: Text('Do It !!'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Not Interested Anymore'),
+            ),
+          ],
         );
       },
     );

@@ -18,13 +18,12 @@ class MemeBloc {
     _memestream.sink.add(event);
   }
 
-  Future<bool> postMeme(Memes meme) async {
-    final bool event = await _repository.postMeme(meme);
-    if (event) {
+  Future<Either<Failures, Unit>> postMeme(Memes meme) async {
+    final event = await _repository.postMeme(meme);
+    return event.fold((l) => left(l), (r) {
       getMemes();
-    }
-    return event;
-    // _memestream.sink.add(event);
+      return right(unit);
+    });
   }
 
   Future<Either<Failures, Unit>> editMeme(Memes meme) async {
@@ -36,15 +35,15 @@ class MemeBloc {
     });
   }
 
-  Future<bool> deleteMeme(int id) async {
+  Future<Either<Failures, Unit>> deleteMeme(int id) async {
     final event = await _repository.deleteMeme(id);
-    if (event) {
+    return event.fold((l) => left(l), (r) {
       getMemes();
-    }
-    return event;
+      return right(unit);
+    });
   }
 
   void dispose() {
-    _memestream.close();
+    // _memestream.close();
   }
 }
