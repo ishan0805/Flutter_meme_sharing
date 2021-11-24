@@ -16,7 +16,7 @@ class ApiHelper implements ApiService {
   ApiHelper() {
     _dio = Dio();
     _dio.options.baseUrl = ApiPaths.baseUrl;
-    _dio.options.connectTimeout = 5000; //5s
+    _dio.options.connectTimeout = 10000; //5s
     _dio.options.receiveTimeout = 3000;
   }
 
@@ -95,8 +95,6 @@ class ApiHelper implements ApiService {
         options: Options(headers: {
           //"Content-Type": "application/json",
           if (_token != "") "Authorization": "Bearer $_token",
-          'Accept': '*/*',
-          'Accept-Encoding': 'gzip, deflate, br'
         }),
         data: data != null ? data : formData,
       );
