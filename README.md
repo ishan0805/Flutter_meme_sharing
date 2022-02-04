@@ -7,5 +7,5 @@ Bloc pattern is used in Flutter for state management and design Pattern .
 
 deployed url - https://eager-mestorf-71d5bb.netlify.app/#/ 
 
-Api Documentation- https://memesharing.herokuapp.com/swagger-ui/#/default/get_memes_get
+Api Documentation- https://memesharing.herokuapp.com/swagger-ui/
 
