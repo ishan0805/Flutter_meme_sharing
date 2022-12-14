@@ -2,7 +2,7 @@ class ApiPaths {
   // Base URL
 
   // final
-  static final baseUrl = 'https://memesharing.herokuapp.com';
+  static final baseUrl = 'https://czgzzv.deta.dev';
 
   //for testing
   //static final baseUrl = 'http://127.0.0.1:8000';

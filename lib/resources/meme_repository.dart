@@ -1,5 +1,5 @@
 import 'package:crio_meme_sharing_app/core/failures.dart';
-import 'package:crio_meme_sharing_app/models/meme.dart';
+import 'package:crio_meme_sharing_app/repository/models/meme.dart';
 import 'package:crio_meme_sharing_app/resources/meme_api_provider.dart';
 import 'package:dartz/dartz.dart';
 

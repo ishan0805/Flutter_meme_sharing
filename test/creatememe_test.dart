@@ -1,5 +1,5 @@
 import 'package:crio_meme_sharing_app/bloc/meme_bloc.dart';
-import 'package:crio_meme_sharing_app/screens/create_meme.dart';
+import 'package:crio_meme_sharing_app/presentation/create_meme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
